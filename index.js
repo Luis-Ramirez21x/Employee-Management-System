@@ -11,7 +11,7 @@ const initPrompt = [
         'View all roles', 
         'View all employees',
         'Add a department',
-        'add a role',
+        'Add a role',
         'add an employee',
         'update an employee',
         ],
@@ -32,6 +32,9 @@ inquirer.prompt(initPrompt).then((response) => {
             break;
         case "Add a department":
             querys.addDepartment();
+            break;
+        case "Add a role":
+            querys.addRole();
             break;
     }
 });
