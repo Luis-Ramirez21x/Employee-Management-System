@@ -57,13 +57,24 @@ getEmployee: function getEmployees() {
 },
 
   //insert new department
-addDepartment: function addDepartment() {
-  db.query(`INSERT INTO department (name) VALUES (?);`,'User-input2' ,(err, result) => {
+addDepartment: function addDepartment() { 
+  const chooseDepartment = [
+    {
+      type: "input",
+      message:"What department would you like to add?",
+      name: "department",
+    },
+  ]
+  inquirer.prompt(chooseDepartment)
+          .then((response) => {
+  db.query(`INSERT INTO department (name) VALUES (?);`, response.department ,(err, result) => {
     if (err) {
       console.log(err);
     }
     console.table(result);
-  });
+  })
+}
+  )
 },
 };
 
