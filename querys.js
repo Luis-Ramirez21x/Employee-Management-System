@@ -117,9 +117,7 @@ addRole: function addRole(){
           .then((response) =>{
             //convert this into an integer
             let id = 0;
-            id = departmentId[departmentsArr.indexOf(response.department)];
-            
-            console.log(id);
+            id = departmentId[departmentsList.indexOf(response.department)];
             db.query(`INSERT INTO roles (title,salary, department_id) VALUES (?,?,?);`, [response.role, response.salary, id] ,(err, result) => {
               if (err) {
                 console.log(err);
