@@ -12,12 +12,12 @@ const initPrompt = [
         'View all employees',
         'Add a department',
         'Add a role',
-        'add an employee',
-        'update an employee',
+        'Add an employee',
+        'Update an employee',
         ],
     },
 ];
-
+function start(){
 inquirer.prompt(initPrompt).then((response) => {
     //based on user response call upon the queries
     switch (response.action){
@@ -36,5 +36,16 @@ inquirer.prompt(initPrompt).then((response) => {
         case "Add a role":
             querys.addRole();
             break;
+        case "Add an employee":
+            querys.addEmployee();
+            break;
+        case "Update an employee":
+            querys.updateEmployeeRole();
+            break;
     }
+    
 });
+
+};
+
+start();

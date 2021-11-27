@@ -24,6 +24,9 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to the movies_db database.`)
   );
+
+
+  
 module.exports = {
     //view all departments
 getDepartments:function getDepartments() {   
@@ -91,8 +94,8 @@ addRole: function addRole(){
             departmentsList[i] = departmentsArr[i].name;
             departmentId[i] = departmentsArr[i].id;
       };
-      
     });
+    
 
   const rolePrompt = [
     {
@@ -115,7 +118,7 @@ addRole: function addRole(){
   
   inquirer.prompt(rolePrompt)
           .then((response) =>{
-            //convert this into an integer
+            
             let id = 0;
             id = departmentId[departmentsList.indexOf(response.department)];
             db.query(`INSERT INTO roles (title,salary, department_id) VALUES (?,?,?);`, [response.role, response.salary, id] ,(err, result) => {
@@ -125,28 +128,163 @@ addRole: function addRole(){
               console.log(result);
             });
           })
-}
-
-};
-
-
+},
 
   //insert employee, select all roles and all employees 
-function addEmployee() {
-  db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?);`, ['John', 'Doe', 2, Luis] ,(err, result) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(result);
-  });
-};
+addEmployee: function addEmployee() {
+     let rolesArr = [];
+     let rolesList = [];
+     let rolesId = [];
+     db.query(`SELECT * FROM roles`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      rolesArr = result;
+      for(i=0; i < rolesArr.length; i++){
+            rolesList[i] = rolesArr[i].title;
+            rolesId[i] = rolesArr[i].id;
+      };
+    });
+
+     let employeeArr = [];
+     let employeeList = [];
+     let employeeId = [];
+    db.query(`SELECT * FROM employee`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      
+      employeeArr = result;
+      
+      for(i=0; i < employeeArr.length; i++){
+            employeeList[i] = employeeArr[i].first_name + " " + employeeArr[i].last_name ;
+            employeeId[i] = employeeArr[i].id;
+      };
+
+    });
+    
+
+   const managerPrompt = [
+    {
+      type: "input",
+      message:"What is your employee's first name?",
+      name: "firstName",
+    },
+    {
+      type: "input",
+      message:"What is your employee's last name?",
+      name: "lastName",
+    },
+    {
+      type: "list",
+      message:"What title will your employee have?",
+      name: "title",
+      choices: rolesList,
+    },
+    {
+      type: "list",
+      message:"Whose there manager?",
+      name: "manager",
+      choices: employeeList,
+    },
+  ]
+//maybe wrap the prompt into a function?
+
+  inquirer.prompt(managerPrompt)
+  .then((response) =>{
+
+let titleId = 0;
+titleId = rolesId[rolesList.indexOf(response.title)];
+
+let managerId = 0;
+managerId = employeeId[employeeList.indexOf(response.manager)];
+
+db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?);`, [response.firstName, response.lastName, titleId, managerId] ,(err, result) => {
+if (err) {
+console.log(err);
+}
+console.log(result);
+});
+});
+
+
+
+},
+
+
 
   //update employee. select all employees, grab role_id, update title to dropdown role;
-function updateEmployeeRole(){
-  db.query(`UPDATE roles SET title = "?" WHERE id = ?`, ['John', 1] ,(err, result) => {
+updateEmployeeRole: function updateEmployeeRole(){
+  let rolesArr = [];
+  let rolesList = [];
+  let rolesId = [];
+  db.query(`SELECT * FROM roles`, (err, result) => {
+   if (err) {
+     console.log(err);
+   }
+   rolesArr = result;
+   for(i=0; i < rolesArr.length; i++){
+         rolesList[i] = rolesArr[i].title;
+         rolesId[i] = rolesArr[i].id;
+   };
+   
+ });
+  
+
+  let employeeArr = [];
+  let employeeList = [];
+  let employeeId = [];
+  db.query(`SELECT * FROM employee`, (err, result) => {
+   if (err) {
+     console.log(err);
+   }
+   
+   employeeArr = result;
+   
+   for(i=0; i < employeeArr.length; i++){
+         employeeList[i] = employeeArr[i].first_name + " " + employeeArr[i].last_name ;
+         employeeId[i] = employeeArr[i].id;
+   };
+  
+ });
+//creating prompt
+
+  const prompt = [
+    {
+      type: "list",
+      message:"Are you sure you'd like to adjust an employee's role?",
+      name: "yoink",
+      choices: ['Yes', 'No'],
+    },
+    {
+      type: "list",
+      message:"Which employee's role would you like to change?",
+      name: "employee",
+      choices: employeeList,
+    },
+    {
+      type: "list",
+      message:"What role would you like to choose?",
+      name: "title",
+      choices: rolesList,
+    },
+  ]
+  inquirer.prompt(prompt).then((response) =>{
+    
+    let id = 0;
+    id = employeeId[employeeList.indexOf(response.employee)];
+    
+    let titleId = 0;
+    titleId = rolesId[rolesList.indexOf(response.title)];
+
+  
+  //REMEMEBR TO CHNAGE ROLE ID TOO!
+  db.query(`UPDATE employee SET role_id = "?" WHERE id = ?`, [titleId, id] ,(err, result) => {
     if (err) {
       console.log(err);
     }
     console.log(result);
   });
+})
+},
 };
