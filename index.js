@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+//const connection = require('mysql2/typings/mysql/lib/Connection');
 const querys = require('./querys');
 
 const initPrompt = [
@@ -14,15 +15,17 @@ const initPrompt = [
         'Add a role',
         'Add an employee',
         'Update an employee',
+        'Done',
         ],
     },
 ];
-function start(){
-inquirer.prompt(initPrompt).then((response) => {
+async function start(){
+const response = await inquirer.prompt(initPrompt)
+console.clear();
     //based on user response call upon the queries
     switch (response.action){
         case "View all departments":
-            querys.getDepartments();
+            await querys.getDepartments();
             break;
         case "View all roles":
             querys.getRoles();
@@ -31,21 +34,19 @@ inquirer.prompt(initPrompt).then((response) => {
             querys.getEmployee();
             break;
         case "Add a department":
-            querys.addDepartment();
+            await querys.addDepartment();
             break;
         case "Add a role":
-            querys.addRole();
+            await querys.addRole();
             break;
         case "Add an employee":
-            querys.addEmployee();
+            await querys.addEmployee();
             break;
         case "Update an employee":
-            querys.updateEmployeeRole();
+            await querys.updateEmployeeRole();
             break;
     }
-    
-});
-
+ start();
 };
 
 start();

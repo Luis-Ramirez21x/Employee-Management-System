@@ -29,7 +29,7 @@ const db = mysql.createConnection(
   
 module.exports = {
     //view all departments
-getDepartments:function getDepartments() {   
+getDepartments: async function getDepartments() {   
   db.query(`SELECT * FROM DEPARTMENT`, (err, result) => {
     if (err) {
       console.log(err);
@@ -60,7 +60,7 @@ getEmployee: function getEmployees() {
 },
 
   //insert new department
-addDepartment: function addDepartment() { 
+addDepartment: async function addDepartment() { 
   const departmentPrompt = [
     {
       type: "input",
@@ -68,20 +68,19 @@ addDepartment: function addDepartment() {
       name: "department",
     },
   ]
-  inquirer.prompt(departmentPrompt)
-          .then((response) => {
+  const response = await inquirer.prompt(departmentPrompt);
+          
   db.query(`INSERT INTO department (name) VALUES (?);`, response.department ,(err, result) => {
     if (err) {
       console.log(err);
     }
     console.table(result);
   })
-}
-  )
+
 },
 
   //insert new role, create drop down for department, and a select to get all departments
-addRole: function addRole(){
+addRole: async function addRole(){
      let departmentsArr = [];
      let departmentsList = [];
      let departmentId = [];
@@ -116,22 +115,21 @@ addRole: function addRole(){
     },
   ]
   
-  inquirer.prompt(rolePrompt)
-          .then((response) =>{
-            
+   const response = await inquirer.prompt(rolePrompt);
+  
             let id = 0;
             id = departmentId[departmentsList.indexOf(response.department)];
             db.query(`INSERT INTO roles (title,salary, department_id) VALUES (?,?,?);`, [response.role, response.salary, id] ,(err, result) => {
               if (err) {
                 console.log(err);
               }
-              console.log(result);
+             // console.log(result);
             });
-          })
+          
 },
 
   //insert employee, select all roles and all employees 
-addEmployee: function addEmployee() {
+addEmployee: async function addEmployee() {
      let rolesArr = [];
      let rolesList = [];
      let rolesId = [];
@@ -190,8 +188,8 @@ addEmployee: function addEmployee() {
   ]
 //maybe wrap the prompt into a function?
 
-  inquirer.prompt(managerPrompt)
-  .then((response) =>{
+  const response= await inquirer.prompt(managerPrompt);
+  
 
 let titleId = 0;
 titleId = rolesId[rolesList.indexOf(response.title)];
@@ -203,9 +201,9 @@ db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALU
 if (err) {
 console.log(err);
 }
-console.log(result);
+//console.log(result);
 });
-});
+
 
 
 
@@ -214,7 +212,7 @@ console.log(result);
 
 
   //update employee. select all employees, grab role_id, update title to dropdown role;
-updateEmployeeRole: function updateEmployeeRole(){
+updateEmployeeRole: async function updateEmployeeRole(){
   let rolesArr = [];
   let rolesList = [];
   let rolesId = [];
@@ -269,7 +267,7 @@ updateEmployeeRole: function updateEmployeeRole(){
       choices: rolesList,
     },
   ]
-  inquirer.prompt(prompt).then((response) =>{
+  const response = await inquirer.prompt(prompt)
     
     let id = 0;
     id = employeeId[employeeList.indexOf(response.employee)];
@@ -283,8 +281,8 @@ updateEmployeeRole: function updateEmployeeRole(){
     if (err) {
       console.log(err);
     }
-    console.log(result);
+    //console.log(result);
   });
-})
+
 },
 };
